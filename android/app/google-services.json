@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "910483869279",
+    "project_id": "ai-language-learning-app-49636",
+    "storage_bucket": "ai-language-learning-app-49636.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:910483869279:android:22305cf6cf2b781cba95ea",
+        "android_client_info": {
+          "package_name": "com.example.ai_language_learning_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPL0hb4DDt6HZWbTfTALhU5_PhvJUcEWI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
