@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/chat_model.dart';
-import '../services/firestore_service.dart';
+import '../services/gemini_service.dart';
 
 class ChatProvider extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
