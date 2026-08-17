@@ -55,6 +55,7 @@ class ChatProvider extends ChangeNotifier {
       if (_selectedChatId == chatId) {
         _selectedChatId = null;
       }
+      notifyListeners();
     } catch (e) {
       _errorMessage = 'Failed to delete conversation: $e';
       notifyListeners();
