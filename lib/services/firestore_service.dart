@@ -29,7 +29,21 @@ class FirestoreService {
   }
 
   Future<void> deleteChat(String chatId) async {
-    await _db.collection('chats').doc(chatId).delete();
+    // Firestore does not cascade-delete subcollections, so we must
+    // manually delete every message before deleting the chat itself.
+    final messagesSnapshot = await _db
+        .collection('chats')
+        .doc(chatId)
+        .collection('messages')
+        .get();
+
+    final batch = _db.batch();
+    for (final doc in messagesSnapshot.docs) {
+      batch.delete(doc.reference);
+    }
+    batch.delete(_db.collection('chats').doc(chatId));
+
+    await batch.commit();
   }
 
   Future<void> updateChatMeta(String chatId, {required String lastMessage}) async {
