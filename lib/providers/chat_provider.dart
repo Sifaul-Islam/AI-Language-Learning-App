@@ -19,16 +19,20 @@ class ChatProvider extends ChangeNotifier {
 
   // Call this once (e.g. in initState of Home screen) to start listening
   void listenToChats() {
-    _firestoreService.streamChats().listen(
-      (chatList) {
-        _chats = chatList;
-        notifyListeners();
-      },
-      onError: (error) {
-        _errorMessage = 'Failed to load conversations: $error';
-        notifyListeners();
-      },
-    );
+    try {
+      _firestoreService.streamChats().listen(
+        (chatList) {
+          _chats = chatList;
+          notifyListeners();
+        },
+        onError: (error) {
+          _errorMessage = 'Failed to load conversations: $error';
+          notifyListeners();
+        },
+      );
+    } catch (e) {
+      _errorMessage = 'Firestore error: $e';
+    }
   }
 
   Future<String?> createNewChat(String language) async {
