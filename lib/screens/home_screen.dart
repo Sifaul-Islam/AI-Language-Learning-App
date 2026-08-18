@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/chat_provider.dart';
-import '../models/language_data.dart';
 import 'language_selection_screen.dart';
 import 'saved_conversations_screen.dart';
 // import 'chat_screen.dart'; // Anni will create this on her branch
@@ -18,8 +17,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // Start listening to Firestore chat updates as soon as Home loads
-    Future.microtask(() {
-      context.read<ChatProvider>().listenToChats();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<ChatProvider>().listenToChats();
+      }
     });
   }
 
