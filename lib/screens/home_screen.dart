@@ -1,7 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/chat_provider.dart';
-import '../models/language_data.dart';
 import 'language_selection_screen.dart';
 import 'saved_conversations_screen.dart';
 
@@ -17,7 +16,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      context.read<ChatProvider>().listenToChats();
+      if (mounted) {
+        context.read<ChatProvider>().listenToChats();
+      }
     });
   }
 
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('AI Language Tutor'),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

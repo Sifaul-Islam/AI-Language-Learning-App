@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../models/chat_model.dart';
 import '../services/firestore_service.dart';
 
@@ -18,16 +18,20 @@ class ChatProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   void listenToChats() {
-    _firestoreService.streamChats().listen(
-      (chatList) {
-        _chats = chatList;
-        notifyListeners();
-      },
-      onError: (error) {
-        _errorMessage = 'Failed to load conversations: $error';
-        notifyListeners();
-      },
-    );
+    try {
+      _firestoreService.streamChats().listen(
+        (chatList) {
+          _chats = chatList;
+          notifyListeners();
+        },
+        onError: (error) {
+          _errorMessage = 'Failed to load conversations: $error';
+          notifyListeners();
+        },
+      );
+    } catch (e) {
+      _errorMessage = 'Firestore error: $e';
+    }
   }
 
   Future<String?> createNewChat(String language) async {

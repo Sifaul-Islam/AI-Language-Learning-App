@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import '../models/chat_model.dart';
+import '../models/message_model.dart';
+import '../services/firestore_service.dart';
 import '../services/gemini_service.dart';
 
-class ChatProvider extends ChangeNotifier {
+class MessageProvider extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
+  final GeminiService _geminiService = GeminiService();
 
-  List<ChatModel> _chats = [];
-  List<ChatModel> get chats => _chats;
-
-  String? _selectedChatId;
-  String? get selectedChatId => _selectedChatId;
+  List<MessageModel> _messages = [];
+  List<MessageModel> get messages => _messages;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -17,54 +16,116 @@ class ChatProvider extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  // Call this once (e.g. in initState of Home screen) to start listening
-  void listenToChats() {
-    _firestoreService.streamChats().listen(
-      (chatList) {
-        _chats = chatList;
-        notifyListeners();
-      },
-      onError: (error) {
-        _errorMessage = 'Failed to load conversations: $error';
-        notifyListeners();
-      },
-    );
+  String? _lastFailedText;
+  String? _lastFailedChatId;
+  String? _lastFailedLanguage;
+
+  /// Start listening to live Firestore message updates for [chatId]
+  void listenToMessages(String chatId) {
+    _messages = [];
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _firestoreService.streamMessages(chatId).listen(
+        (messageList) {
+          _messages = messageList;
+          notifyListeners();
+        },
+        onError: (error) {
+          _errorMessage = 'Failed to load messages: $error';
+          notifyListeners();
+        },
+      );
+    } catch (e) {
+      _errorMessage = 'Firestore error: $e';
+    }
   }
 
-  Future<String?> createNewChat(String language) async {
+  /// Send user message to Firestore, trigger Gemini AI API, and save AI response
+  Future<void> sendMessage({
+    required String chatId,
+    required String text,
+    required String language,
+  }) async {
+    if (text.trim().isEmpty) return;
+
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
-      final chatId = await _firestoreService.createChat(language: language);
-      _selectedChatId = chatId;
-      _isLoading = false;
-      notifyListeners();
-      return chatId;
+      // 1. Save user message to Firestore
+      final userMessage = MessageModel(
+        id: '',
+        sender: 'user',
+        message: text.trim(),
+        timestamp: DateTime.now(),
+      );
+
+      await _firestoreService.addMessage(chatId, userMessage);
+      await _firestoreService.updateChatMeta(chatId, lastMessage: text.trim());
+
+      // 2. Fetch AI response from Gemini API
+      final aiReply = await _geminiService.sendMessage(text.trim(), language);
+
+      // 3. Save AI message to Firestore
+      final aiMessage = MessageModel(
+        id: '',
+        sender: 'ai',
+        message: aiReply,
+        timestamp: DateTime.now(),
+      );
+
+      await _firestoreService.addMessage(chatId, aiMessage);
+      await _firestoreService.updateChatMeta(chatId, lastMessage: aiReply);
     } catch (e) {
-      _errorMessage = 'Failed to create conversation: $e';
+      _lastFailedChatId = chatId;
+      _lastFailedText = text;
+      _lastFailedLanguage = language;
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return null;
     }
   }
 
-  Future<void> deleteChat(String chatId) async {
-    try {
-      await _firestoreService.deleteChat(chatId);
-      if (_selectedChatId == chatId) {
-        _selectedChatId = null;
+  /// Retry sending the last failed message to Gemini AI
+  Future<void> retrySendMessage() async {
+    if (_lastFailedChatId != null &&
+        _lastFailedText != null &&
+        _lastFailedLanguage != null) {
+      final chatId = _lastFailedChatId!;
+      final text = _lastFailedText!;
+      final language = _lastFailedLanguage!;
+
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+
+      try {
+        final aiReply = await _geminiService.sendMessage(text, language);
+
+        final aiMessage = MessageModel(
+          id: '',
+          sender: 'ai',
+          message: aiReply,
+          timestamp: DateTime.now(),
+        );
+
+        await _firestoreService.addMessage(chatId, aiMessage);
+        await _firestoreService.updateChatMeta(chatId, lastMessage: aiReply);
+
+        _lastFailedChatId = null;
+        _lastFailedText = null;
+        _lastFailedLanguage = null;
+      } catch (e) {
+        _errorMessage = e.toString().replaceAll('Exception: ', '');
+      } finally {
+        _isLoading = false;
+        notifyListeners();
       }
-      notifyListeners();
-    } catch (e) {
-      _errorMessage = 'Failed to delete conversation: $e';
-      notifyListeners();
     }
-  }
-
-  void selectChat(String chatId) {
-    _selectedChatId = chatId;
-    notifyListeners();
   }
 
   void clearError() {
