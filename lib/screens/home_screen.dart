@@ -15,7 +15,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Start listening to Firestore chat updates as soon as Home loads
     Future.microtask(() {
       if (mounted) {
         context.read<ChatProvider>().listenToChats();
@@ -38,19 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: Theme.of(context).primaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
               icon: const Icon(Icons.add),
-              label: const Text(
-                'Start New Conversation',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+              label: const Text('Start New Conversation'),
               onPressed: () {
                 Navigator.push(
                   context,

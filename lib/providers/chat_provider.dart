@@ -17,7 +17,6 @@ class ChatProvider extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  // Call this once (e.g. in initState of Home screen) to start listening
   void listenToChats() {
     try {
       _firestoreService.streamChats().listen(
@@ -59,6 +58,7 @@ class ChatProvider extends ChangeNotifier {
       if (_selectedChatId == chatId) {
         _selectedChatId = null;
       }
+      notifyListeners();
     } catch (e) {
       _errorMessage = 'Failed to delete conversation: $e';
       notifyListeners();
