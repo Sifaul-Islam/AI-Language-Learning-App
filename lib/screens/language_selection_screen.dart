@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/chat_provider.dart';
 import '../models/language_data.dart';
+import '../providers/chat_provider.dart';
 import 'chat_screen.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
@@ -41,7 +41,10 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Select a Language')),
+      appBar: AppBar(
+        title: const Text('Select Target Language'),
+        centerTitle: true,
+      ),
       body: _isCreating
           ? const Center(child: CircularProgressIndicator())
           : ListView.separated(
@@ -51,15 +54,27 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               itemBuilder: (context, index) {
                 final lang = supportedLanguages[index];
                 return Card(
+                  elevation: 1,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     leading: Text(
                       lang.flag,
-                      style: const TextStyle(fontSize: 28),
+                      style: const TextStyle(fontSize: 32),
                     ),
                     title: Text(
                       lang.name,
-                      style: const TextStyle(fontSize: 16),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                    subtitle: Text('Practice speaking and writing in ${lang.name}'),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () => _selectLanguage(lang.name),
                   ),

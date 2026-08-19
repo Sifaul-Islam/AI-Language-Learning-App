@@ -20,7 +20,6 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) {
         context.read<ChatProvider>().listenToChats();
       }
-
     });
   }
 
@@ -31,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('AI Language Tutor'),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
