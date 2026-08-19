@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../models/chat_model.dart';
 import '../services/firestore_service.dart';
 
@@ -17,7 +17,6 @@ class ChatProvider extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  // Call this once (e.g. in initState of Home screen) to start listening
   void listenToChats() {
     _firestoreService.streamChats().listen(
       (chatList) {

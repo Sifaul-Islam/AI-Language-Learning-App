@@ -30,6 +30,7 @@ class SavedConversationsScreen extends StatelessWidget {
     final chats = chatProvider.chats;
 
     final listView = ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       itemCount: chats.length,
       itemBuilder: (context, index) {
         final chat = chats[index];
@@ -37,7 +38,11 @@ class SavedConversationsScreen extends StatelessWidget {
           key: ValueKey(chat.id),
           direction: DismissDirection.endToStart,
           background: Container(
-            color: Colors.red,
+            margin: const EdgeInsets.symmetric(vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.red.shade400,
+              borderRadius: BorderRadius.circular(16),
+            ),
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: const Icon(Icons.delete, color: Colors.white),
@@ -65,15 +70,22 @@ class SavedConversationsScreen extends StatelessWidget {
           onDismissed: (direction) {
             context.read<ChatProvider>().deleteChat(chat.id);
           },
-          child: ListTile(
-            title: Text(chat.title),
-            subtitle: Text(
-              '${chat.language} • ${chat.lastMessage}\n${_formatTimestamp(chat.updatedAt)}',
+          child: Card(
+            margin: const EdgeInsets.symmetric(vertical: 6),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              title: Text(
+                chat.title,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              subtitle: Text(
+                '${chat.language} • ${chat.lastMessage}\n${_formatTimestamp(chat.updatedAt)}',
+              ),
+              isThreeLine: true,
+              onTap: () {
+                // TODO: navigate to ChatScreen with chat.id once it exists
+              },
             ),
-            isThreeLine: true,
-            onTap: () {
-              // TODO: navigate to ChatScreen with chat.id once it exists
-            },
           ),
         );
       },

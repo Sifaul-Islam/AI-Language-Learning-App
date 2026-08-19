@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/chat_provider.dart';
 import 'language_selection_screen.dart';
 import 'saved_conversations_screen.dart';
-// import 'chat_screen.dart'; // Anni will create this on her branch
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) {
         context.read<ChatProvider>().listenToChats();
       }
+
     });
   }
 
@@ -68,4 +68,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
