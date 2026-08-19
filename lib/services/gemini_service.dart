@@ -7,6 +7,25 @@ class GeminiService {
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
 
   Future<String> sendMessage(String userMessage, String language) async {
+    const maxRetries = 2;
+    int attempt = 0;
+
+    while (true) {
+      try {
+        return await _makeRequest(userMessage, language);
+      } catch (e) {
+        attempt++;
+        final isBusy = e.toString().contains('busy');
+        if (isBusy && attempt <= maxRetries) {
+          await Future.delayed(Duration(seconds: attempt * 2));
+          continue;
+        }
+        rethrow;
+      }
+    }
+  }
+
+  Future<String> _makeRequest(String userMessage, String language) async {
     final url = Uri.parse(_baseUrl);
 
     final prompt =
@@ -35,7 +54,15 @@ class GeminiService {
           .timeout(const Duration(seconds: 20));
 
       if (response.statusCode != 200) {
-        throw Exception('Gemini API error: ${response.statusCode}');
+        if (response.statusCode == 503) {
+          throw Exception('The AI tutor is a bit busy right now. Please try again.');
+        } else if (response.statusCode == 429) {
+          throw Exception('Too many requests. Please wait a moment and try again.');
+        } else if (response.statusCode == 401 || response.statusCode == 403) {
+          throw Exception('AI tutor authentication failed. Please check the API key.');
+        } else {
+          throw Exception('Something went wrong (error ${response.statusCode}). Please try again.');
+        }
       }
 
       final data = jsonDecode(response.body);
@@ -43,8 +70,6 @@ class GeminiService {
       return text as String;
     } on http.ClientException {
       throw Exception('Network error — check your connection.');
-    } catch (e) {
-      throw Exception('Failed to get AI response: $e');
     }
   }
 }

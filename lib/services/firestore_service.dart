@@ -1,15 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/chat_model.dart';
 import '../models/message_model.dart';
 
 class FirestoreService {
   final _db = FirebaseFirestore.instance;
 
+  String get _currentUserId {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No authenticated user. Please sign in.');
+    }
+    return user.uid;
+  }
+
   // --- Chats ---
 
   Stream<List<ChatModel>> streamChats() {
     return _db
         .collection('chats')
+        .where('userId', isEqualTo: _currentUserId)
         .orderBy('updatedAt', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs
@@ -19,6 +29,7 @@ class FirestoreService {
 
   Future<String> createChat({required String language}) async {
     final docRef = await _db.collection('chats').add({
+      'userId': _currentUserId,
       'language': language,
       'title': 'New Conversation',
       'lastMessage': '',

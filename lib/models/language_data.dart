@@ -1,35 +1,42 @@
+import 'package:flutter/material.dart';
+
 class LanguageOption {
   final String name;
   final String flag; // emoji flag, keeps UI simple with no image assets
+  final List<Color> gradientColors;
 
-  const LanguageOption({required this.name, required this.flag});
+  const LanguageOption({
+    required this.name,
+    required this.flag,
+    required this.gradientColors,
+  });
 }
 
-const List<LanguageOption> supportedLanguages = [
-  LanguageOption(name: 'Spanish', flag: '🇪🇸'),
-  LanguageOption(name: 'French', flag: '🇫🇷'),
-  LanguageOption(name: 'Japanese', flag: '🇯🇵'),
-  LanguageOption(name: 'German', flag: '🇩🇪'),
-  LanguageOption(name: 'Korean', flag: '🇰🇷'),
-  LanguageOption(name: 'Italian', flag: '🇮🇹'),
-  LanguageOption(name: 'Portuguese', flag: '🇵🇹'),
-  LanguageOption(name: 'Mandarin Chinese', flag: '🇨🇳'),
-  LanguageOption(name: 'Russian', flag: '🇷🇺'),
-  LanguageOption(name: 'Arabic', flag: '🇸🇦'),
-  LanguageOption(name: 'Hindi', flag: '🇮🇳'),
-  LanguageOption(name: 'Bengali', flag: '🇧🇩'),
-  LanguageOption(name: 'Turkish', flag: '🇹🇷'),
-  LanguageOption(name: 'Dutch', flag: '🇳🇱'),
-  LanguageOption(name: 'Greek', flag: '🇬🇷'),
-  LanguageOption(name: 'Polish', flag: '🇵🇱'),
-  LanguageOption(name: 'Swedish', flag: '🇸🇪'),
-  LanguageOption(name: 'Vietnamese', flag: '🇻🇳'),
-  LanguageOption(name: 'Thai', flag: '🇹🇭'),
-  LanguageOption(name: 'Indonesian', flag: '🇮🇩'),
-  LanguageOption(name: 'Hebrew', flag: '🇮🇱'),
-  LanguageOption(name: 'Ukrainian', flag: '🇺🇦'),
-  LanguageOption(name: 'Czech', flag: '🇨🇿'),
-  LanguageOption(name: 'Finnish', flag: '🇫🇮'),
-  LanguageOption(name: 'Danish', flag: '🇩🇰'),
-  LanguageOption(name: 'Norwegian', flag: '🇳🇴'),
+final List<LanguageOption> supportedLanguages = [
+  const LanguageOption(name: 'Spanish', flag: '🇪🇸', gradientColors: [Color(0xFFF5A623), Color(0xFFE63946)]),
+  const LanguageOption(name: 'French', flag: '🇫🇷', gradientColors: [Color(0xFF3F7FE0), Color(0xFFE63946)]),
+  const LanguageOption(name: 'Japanese', flag: '🇯🇵', gradientColors: [Color(0xFFE63946), Color(0xFFB92D3A)]),
+  const LanguageOption(name: 'German', flag: '🇩🇪', gradientColors: [Color(0xFF3A3A3A), Color(0xFFE0A800)]),
+  const LanguageOption(name: 'Korean', flag: '🇰🇷', gradientColors: [Color(0xFF3F7FE0), Color(0xFF9B7EF0)]),
+  const LanguageOption(name: 'Italian', flag: '🇮🇹', gradientColors: [Color(0xFF2DBE91), Color(0xFFE63946)]),
+  const LanguageOption(name: 'Portuguese', flag: '🇵🇹', gradientColors: [Color(0xFF2DBE91), Color(0xFFE0A800)]),
+  const LanguageOption(name: 'Mandarin Chinese', flag: '🇨🇳', gradientColors: [Color(0xFFE63946), Color(0xFFE0A800)]),
+  const LanguageOption(name: 'Russian', flag: '🇷🇺', gradientColors: [Color(0xFF3F7FE0), Color(0xFFE63946)]),
+  const LanguageOption(name: 'Arabic', flag: '🇸🇦', gradientColors: [Color(0xFF2DBE91), Color(0xFF3A3A3A)]),
+  const LanguageOption(name: 'Hindi', flag: '🇮🇳', gradientColors: [Color(0xFFF5A623), Color(0xFF2DBE91)]),
+  const LanguageOption(name: 'Bengali', flag: '🇧🇩', gradientColors: [Color(0xFF2DBE91), Color(0xFFB92D3A)]),
+  const LanguageOption(name: 'Turkish', flag: '🇹🇷', gradientColors: [Color(0xFFE63946), Color(0xFFB92D3A)]),
+  const LanguageOption(name: 'Dutch', flag: '🇳🇱', gradientColors: [Color(0xFFE63946), Color(0xFF3F7FE0)]),
+  const LanguageOption(name: 'Greek', flag: '🇬🇷', gradientColors: [Color(0xFF3F7FE0), Color(0xFF6FA8E8)]),
+  const LanguageOption(name: 'Polish', flag: '🇵🇱', gradientColors: [Color(0xFFE63946), Color(0xFFB0B0B0)]),
+  const LanguageOption(name: 'Swedish', flag: '🇸🇪', gradientColors: [Color(0xFF3F7FE0), Color(0xFFE0A800)]),
+  const LanguageOption(name: 'Vietnamese', flag: '🇻🇳', gradientColors: [Color(0xFFE63946), Color(0xFFE0A800)]),
+  const LanguageOption(name: 'Thai', flag: '🇹🇭', gradientColors: [Color(0xFFE63946), Color(0xFF3F7FE0)]),
+  const LanguageOption(name: 'Indonesian', flag: '🇮🇩', gradientColors: [Color(0xFFE63946), Color(0xFFB0B0B0)]),
+  const LanguageOption(name: 'Hebrew', flag: '🇮🇱', gradientColors: [Color(0xFF3F7FE0), Color(0xFF9B7EF0)]),
+  const LanguageOption(name: 'Ukrainian', flag: '🇺🇦', gradientColors: [Color(0xFF3F7FE0), Color(0xFFE0A800)]),
+  const LanguageOption(name: 'Czech', flag: '🇨🇿', gradientColors: [Color(0xFF3F7FE0), Color(0xFFE63946)]),
+  LanguageOption(name: 'Finnish', flag: '🇫🇮', gradientColors: [const Color(0xFF3F7FE0), const Color(0xFFFFFFFF).withValues(alpha: 0.9)]),
+  const LanguageOption(name: 'Danish', flag: '🇩🇰', gradientColors: [Color(0xFFE63946), Color(0xFFB92D3A)]),
+  const LanguageOption(name: 'Norwegian', flag: '🇳🇴', gradientColors: [Color(0xFFE63946), Color(0xFF3F7FE0)]),
 ];

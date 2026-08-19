@@ -19,6 +19,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  bool _isCoolingDown = false;
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -51,19 +52,24 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void _sendMessage() {
-    final text = _messageController.text.trim();
-    if (text.isEmpty) return;
+void _sendMessage() {
+  final text = _messageController.text.trim();
+  if (text.isEmpty || _isCoolingDown) return;
 
-    _messageController.clear();
-    context.read<MessageProvider>().sendMessage(
-          chatId: widget.chatId,
-          text: text,
-          language: widget.language,
-        );
-    _scrollToBottom();
-  }
+  _messageController.clear();
+  context.read<MessageProvider>().sendMessage(
+        chatId: widget.chatId,
+        text: text,
+        language: widget.language,
+      );
+  _scrollToBottom();
 
+  // Brief cooldown to avoid hitting Gemini's free-tier rate limit
+  setState(() => _isCoolingDown = true);
+  Future.delayed(const Duration(seconds: 3), () {
+    if (mounted) setState(() => _isCoolingDown = false);
+  });
+}
   @override
   Widget build(BuildContext context) {
     final messageProvider = context.watch<MessageProvider>();
@@ -176,7 +182,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   const SizedBox(width: 8),
                   IconButton.filled(
-                    onPressed: messageProvider.isLoading ? null : _sendMessage,
+                    onPressed: messageProvider.isLoading || _isCoolingDown ? null : _sendMessage,
                     icon: messageProvider.isLoading
                         ? const SizedBox(
                             width: 20,
