@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/chat_provider.dart';
+import 'chat_screen.dart';
 
 class SavedConversationsScreen extends StatelessWidget {
   final bool embedded;
@@ -83,9 +84,14 @@ class SavedConversationsScreen extends StatelessWidget {
               ),
               isThreeLine: true,
               onTap: () {
-                // TODO: navigate to ChatScreen with chat.id once it exists
-              },
-            ),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChatScreen(chatId: chat.id, language: chat.language),
+                    ),
+                  );
+                },
+                            ),
           ),
         );
       },

@@ -4,10 +4,10 @@ import 'package:http/http.dart' as http;
 class GeminiService {
   static const String _apiKey = String.fromEnvironment('GEMINI_API_KEY');
   static const String _baseUrl =
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
 
   Future<String> sendMessage(String userMessage, String language) async {
-    final url = Uri.parse('$_baseUrl?key=$_apiKey');
+    final url = Uri.parse(_baseUrl);
 
     final prompt =
         "You are a friendly $language language tutor. Respond in $language "
@@ -18,7 +18,10 @@ class GeminiService {
       final response = await http
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'X-goog-api-key': _apiKey,
+            },
             body: jsonEncode({
               "contents": [
                 {
