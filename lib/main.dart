@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'theme/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
+import 'providers/chat_provider.dart';
 import 'providers/message_provider.dart';
-import 'providers/message_provider.dart'; 
-providers: [
-  ChangeNotifierProvider(create: (_) => ChatProvider()),
-  ChangeNotifierProvider(create: (_) => MessageProvider()), // add this
-],
+import 'providers/auth_provider.dart';
+import 'screens/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,19 +23,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
-        // MessageProvider will be added here once merged from teammate's branch
+        ChangeNotifierProvider(create: (_) => MessageProvider()),
       ],
       child: MaterialApp(
         title: 'AI Language Tutor',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.indigo,
-          useMaterial3: true,
-        ),
-        home: const Scaffold(
-          body: Center(child: Text('Provider Wired')),
-        ),
+        theme: AppTheme.lightTheme,
+        home: const AuthGate(),
       ),
     );
   }
