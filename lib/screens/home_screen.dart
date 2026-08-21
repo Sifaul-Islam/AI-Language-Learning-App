@@ -65,11 +65,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          child: const Icon(Icons.translate_rounded,
-                              color: Colors.white, size: 22),
+                          child: const Icon(Icons.forum_rounded,
+                              color: Colors.white, size: 30),
                         ),
                         const SizedBox(width: 12),
                         const Expanded(

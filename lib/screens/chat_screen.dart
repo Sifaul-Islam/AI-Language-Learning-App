@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../theme/app_theme.dart';
 import 'package:intl/intl.dart';
 import '../models/message_model.dart';
 import '../providers/message_provider.dart';
@@ -259,8 +260,31 @@ class _MessageBubble extends StatelessWidget {
   }
 }
 
-class _AILoadingBubble extends StatelessWidget {
+class _AILoadingBubble extends StatefulWidget {
   const _AILoadingBubble();
+
+  @override
+  State<_AILoadingBubble> createState() => _AILoadingBubbleState();
+}
+
+class _AILoadingBubbleState extends State<_AILoadingBubble>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -268,7 +292,7 @@ class _AILoadingBubble extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         decoration: BoxDecoration(
           color: Colors.grey.shade200,
           borderRadius: const BorderRadius.only(
@@ -278,21 +302,46 @@ class _AILoadingBubble extends StatelessWidget {
             bottomRight: Radius.circular(16),
           ),
         ),
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: 14,
-              height: 14,
-              child: CircularProgressIndicator(strokeWidth: 2),
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                   
+                    ...List.generate(3, (i) {
+                      final delay = i * 0.2;
+                      final t = (_controller.value - delay) % 1.0;
+                      final bounce = t < 0.5 ? t * 2 : (1 - t) * 2;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: Transform.translate(
+                          offset: Offset(0, -6 * bounce),
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'AI is typing',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.black54,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+
+                  ],
+                );
+              },
             ),
-            SizedBox(width: 10),
-            Text(
-              'AI tutor is typing...',
-              style: TextStyle(fontSize: 13, color: Colors.black54),
-            ),
-          ],
-        ),
       ),
     );
   }

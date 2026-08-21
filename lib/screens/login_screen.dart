@@ -23,30 +23,30 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
-    final auth = context.read<AuthProvider>();
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
+Future<void> _submit() async {
+  final auth = context.read<AuthProvider>();
+  final email = _emailController.text.trim();
+  final password = _passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter email and password.')),
-      );
-      return;
-    }
-
-    final success = _isSignUpMode
-        ? await auth.signUpWithEmail(email, password)
-        : await auth.signInWithEmail(email, password);
-
-    if (!success && mounted && auth.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(auth.errorMessage!)),
-      );
-      auth.clearError();
-    }
+  if (email.isEmpty || password.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please enter email and password.')),
+    );
+    return;
   }
 
+  final success = _isSignUpMode
+      ? await auth.signUpWithEmail(email, password)
+      : await auth.signInWithEmail(email, password);
+
+  if (!mounted) return;
+  if (!success && auth.errorMessage != null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(auth.errorMessage!)),
+    );
+    auth.clearError();
+  }
+}
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
@@ -69,9 +69,26 @@ class _LoginScreenState extends State<LoginScreen> {
                       gradient: AppColors.primaryGradient,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.translate_rounded,
-                        color: Colors.white, size: 32),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Icon(Icons.forum_rounded, color: Colors.white, size: 34),
+                        Positioned(
+                          top: 14,
+                          right: 14,
+                          child: Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              color: AppColors.accent,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1.5),
+                            ),
+                            child: const Icon(Icons.auto_awesome_rounded,
+                                color: Colors.white, size: 10),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 24),
                   Text(
@@ -146,11 +163,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: auth.isLoading
                         ? null
                         : () async {
+                            final navContext = context;
                             final success = await auth.signInWithGoogle();
-                            if (!success &&
-                                mounted &&
-                                auth.errorMessage != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
+                            if (!mounted) return;
+                            if (!success && auth.errorMessage != null) {
+                              // ignore: use_build_context_synchronously
+                              ScaffoldMessenger.of(navContext).showSnackBar(
                                 SnackBar(content: Text(auth.errorMessage!)),
                               );
                               auth.clearError();

@@ -31,7 +31,7 @@ class FirestoreService {
     final docRef = await _db.collection('chats').add({
       'userId': _currentUserId,
       'language': language,
-      'title': 'New Conversation',
+      'title': '$language Practice',
       'lastMessage': '',
       'createdAt': Timestamp.now(),
       'updatedAt': Timestamp.now(),
