@@ -23,6 +23,7 @@ class MessageModel {
     );
   }
 
+
   // Convert a MessageModel object into a Map for writing to Firestore
   Map<String, dynamic> toMap() {
     return {

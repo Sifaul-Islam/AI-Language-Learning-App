@@ -1,135 +1,58 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../models/message_model.dart';
-import '../services/firestore_service.dart';
 import '../services/gemini_service.dart';
+// import '../services/firestore_service.dart'; // add once Umama's is ready
 
 class MessageProvider extends ChangeNotifier {
-  final FirestoreService _firestoreService = FirestoreService();
   final GeminiService _geminiService = GeminiService();
+  // final FirestoreService _firestoreService = FirestoreService();
 
   List<MessageModel> _messages = [];
-  List<MessageModel> get messages => _messages;
-
   bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
   String? _errorMessage;
+
+  List<MessageModel> get messages => _messages;
+  bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  String? _lastFailedText;
-  String? _lastFailedChatId;
-  String? _lastFailedLanguage;
-
-  /// Start listening to live Firestore message updates for [chatId]
-  void listenToMessages(String chatId) {
+  Future<void> loadMessages(String chatId) async {
+    // Stub until Umama's FirestoreService exists:
     _messages = [];
-    _errorMessage = null;
+    // Real version:
+    // _messages = await _firestoreService.getMessages(chatId);
     notifyListeners();
-
-    try {
-      _firestoreService.streamMessages(chatId).listen(
-        (messageList) {
-          _messages = messageList;
-          notifyListeners();
-        },
-        onError: (error) {
-          _errorMessage = 'Failed to load messages: $error';
-          notifyListeners();
-        },
-      );
-    } catch (e) {
-      _errorMessage = 'Firestore error: $e';
-    }
   }
 
-  /// Send user message to Firestore, trigger Gemini AI API, and save AI response
-  Future<void> sendMessage({
-    required String chatId,
-    required String text,
-    required String language,
-  }) async {
-    if (text.trim().isEmpty) return;
-
-    _isLoading = true;
+  Future<void> sendMessage(String chatId, String text, String language) async {
+    final userMsg = MessageModel(
+      messageId: DateTime.now().millisecondsSinceEpoch.toString(),
+      sender: 'user',
+      message: text,
+      timestamp: DateTime.now(),
+    );
+    _messages.add(userMsg);
     _errorMessage = null;
+    _isLoading = true;
     notifyListeners();
 
+
+    // await _firestoreService.addMessage(chatId, userMsg);
+
     try {
-      // 1. Save user message to Firestore
-      final userMessage = MessageModel(
-        id: '',
-        sender: 'user',
-        message: text.trim(),
-        timestamp: DateTime.now(),
-      );
-
-      await _firestoreService.addMessage(chatId, userMessage);
-      await _firestoreService.updateChatMeta(chatId, lastMessage: text.trim());
-
-      // 2. Fetch AI response from Gemini API
-      final aiReply = await _geminiService.sendMessage(text.trim(), language);
-
-      // 3. Save AI message to Firestore
-      final aiMessage = MessageModel(
-        id: '',
+      final aiText = await _geminiService.sendMessage(text, language);
+      final aiMsg = MessageModel(
+        messageId: DateTime.now().millisecondsSinceEpoch.toString(),
         sender: 'ai',
-        message: aiReply,
+        message: aiText,
         timestamp: DateTime.now(),
       );
-
-      await _firestoreService.addMessage(chatId, aiMessage);
-      await _firestoreService.updateChatMeta(chatId, lastMessage: aiReply);
+      _messages.add(aiMsg);
+      // await _firestoreService.addMessage(chatId, aiMsg);
     } catch (e) {
-      _lastFailedChatId = chatId;
-      _lastFailedText = text;
-      _lastFailedLanguage = language;
-      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      _errorMessage = e.toString();
     } finally {
       _isLoading = false;
       notifyListeners();
     }
-  }
-
-  /// Retry sending the last failed message to Gemini AI
-  Future<void> retrySendMessage() async {
-    if (_lastFailedChatId != null &&
-        _lastFailedText != null &&
-        _lastFailedLanguage != null) {
-      final chatId = _lastFailedChatId!;
-      final text = _lastFailedText!;
-      final language = _lastFailedLanguage!;
-
-      _isLoading = true;
-      _errorMessage = null;
-      notifyListeners();
-
-      try {
-        final aiReply = await _geminiService.sendMessage(text, language);
-
-        final aiMessage = MessageModel(
-          id: '',
-          sender: 'ai',
-          message: aiReply,
-          timestamp: DateTime.now(),
-        );
-
-        await _firestoreService.addMessage(chatId, aiMessage);
-        await _firestoreService.updateChatMeta(chatId, lastMessage: aiReply);
-
-        _lastFailedChatId = null;
-        _lastFailedText = null;
-        _lastFailedLanguage = null;
-      } catch (e) {
-        _errorMessage = e.toString().replaceAll('Exception: ', '');
-      } finally {
-        _isLoading = false;
-        notifyListeners();
-      }
-    }
-  }
-
-  void clearError() {
-    _errorMessage = null;
-    notifyListeners();
   }
 }
